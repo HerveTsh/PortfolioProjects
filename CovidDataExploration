@@ -1,0 +1,74 @@
+SELECT * 
+FROM `portfolio-project-316319.covid19_project.covid19_all`
+ORDER BY 3,4;
+
+-- Viewing data ordered by location first then date
+
+SELECT location, date, total_cases, new_cases, total_deaths, population
+FROM `portfolio-project-316319.covid19_project.covid19_all`
+ORDER BY 1,2;
+
+-- Looking at total cases vs total deaths
+-- shows likelihood of dying if you contract covid in your country
+
+SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as Death_Percentage
+From `portfolio-project-316319.covid19_project.covid19_all`
+WHERE location like '%Kingdom%'
+ORDER BY 1,2; 
+
+-- Looking at total cases vs population
+-- Show what percent of the population has gotten covid
+
+SELECT location, date, total_cases, population, (total_cases/population)*100 as Infection_Percentage
+From `portfolio-project-316319.covid19_project.covid19_all`
+WHERE location like '%Kingdom%'
+ORDER BY 1,2; 
+
+-- Looking at countries with Highest Infection Count compared to population
+
+SELECT location, population, MAX(total_cases) as Highest_Infection_Count, MAX((total_cases/population))*100 as Infection_percent
+From `portfolio-project-316319.covid19_project.covid19_all`
+-- WHERE location like '%Kingdom%'
+GROUP BY location, population
+ORDER BY Infection_percent desc;
+
+-- Looking at countries with Highest Death Count compared to population
+-- Data returned continents under location
+
+SELECT location, MAX(cast(total_deaths as int64)) as total_death_count
+From `portfolio-project-316319.covid19_project.covid19_all`
+Where continent is not null 
+group by location
+order by total_death_count desc;
+
+-- Breaking things down by continent
+
+SELECT location, MAX(cast(total_deaths as int64)) as total_death_count
+From `portfolio-project-316319.covid19_project.covid19_all`
+Where continent is null 
+group by location
+order by total_death_count desc;
+
+-- Global Numbers
+
+SELECT date, sum(cast(new_cases as int64)) as total_cases, sum(cast(new_deaths as int64)) as total_deaths, sum(new_deaths)/sum(new_cases)*100 as Death_Percentage
+From `portfolio-project-316319.covid19_project.covid19_all`
+Where continent is not null
+group by date
+order by 1,2; 
+
+-- Global Numbers MAX
+
+SELECT sum(cast(new_cases as int64)) as total_cases, sum(cast(new_deaths as int64)) as totaldeaths, sum(new_deaths)/sum(new_cases)*100 as Death_Percentage
+From `portfolio-project-316319.covid19_project.covid19_all`
+Where continent is not null
+-- group by date
+order by 1,2; 
+
+-- Looking at Total Population vs Vaccinations
+
+SELECT location, cast(population as int64) as population, sum(cast(new_vaccinations as int64)) as total_vaccinations, 
+From `portfolio-project-316319.covid19_project.covid19_all`
+Where continent is not null
+group by location, population
+order by 1,2; 
